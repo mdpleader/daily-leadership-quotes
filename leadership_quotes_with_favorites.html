@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Leadership Quote</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 2rem; margin: 0; background: #f4f4f4; }
+        .quote { font-size: 1.4rem; margin-bottom: 1.5rem; padding: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
+        button, .nav-btn { font-size: 1rem; padding: 0.6rem 1.2rem; border: none; background: #007aff; color: white; border-radius: 6px; cursor: pointer; margin: 0.5rem; }
+        button:hover, .nav-btn:hover { background: #005ecb; }
+        .favorite-btn { background: none; border: none; position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #ccc; }
+        .favorite-btn.favorited { color: gold; }
+    </style>
+</head>
+<body>
+    <h2>Daily Leadership Quote</h2>
+    <div class="quote" id="quote-box">
+        <button class="favorite-btn" onclick="toggleFavorite()">☆</button>
+        <div id="quote-text"></div>
+    </div>
+    <div>
+        <button onclick="showNextQuote()">Next Quote</button>
+        <button onclick="showFavorites()">View Favorites</button>
+    </div>
+
+    <script>
+        const quotes = [
+            "Leadership is not about titles, positions, or flowcharts. It is about one life influencing another. — John C. Maxwell",
+            "You don’t have to be great to start, but you have to start to be great. — Zig Ziglar",
+            "Whatever the mind of man can conceive and believe, it can achieve. — Napoleon Hill",
+            "Change your thoughts and you change your world. — Norman Vincent Peale",
+            "Discipline is the bridge between goals and accomplishment. — Jim Rohn",
+            "The path to success is to take massive, determined action. — Tony Robbins",
+            "A leader is one who knows the way, goes the way, and shows the way. — John C. Maxwell",
+            "Success is the maximum utilization of the ability that you have. — Zig Ziglar",
+            "The starting point of all achievement is desire. — Napoleon Hill",
+            "Stand up to your obstacles and do something about them. You’ll find they haven’t half the strength you think they have. — Norman Vincent Peale"
+        ];
+
+        let index = new Date().getDay() % quotes.length;
+        const quoteText = document.getElementById('quote-text');
+        const starBtn = document.querySelector('.favorite-btn');
+
+        function displayQuote(i) {
+            quoteText.textContent = quotes[i];
+            starBtn.classList.toggle('favorited', isFavorited(quotes[i]));
+        }
+
+        function showNextQuote() {
+            index = (index + 1) % quotes.length;
+            displayQuote(index);
+        }
+
+        function toggleFavorite() {
+            const quote = quotes[index];
+            let favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+            if (favs.includes(quote)) {
+                favs = favs.filter(q => q !== quote);
+            } else {
+                favs.push(quote);
+            }
+            localStorage.setItem('favorites', JSON.stringify(favs));
+            starBtn.classList.toggle('favorited');
+        }
+
+        function isFavorited(quote) {
+            const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+            return favs.includes(quote);
+        }
+
+        function showFavorites() {
+            const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+            if (favs.length === 0) {
+                alert("No favorites yet!");
+            } else {
+                alert("Favorites:\n\n" + favs.join("\n\n"));
+            }
+        }
+
+        displayQuote(index);
+    </script>
+</body>
+</html>
