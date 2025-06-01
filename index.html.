@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Daily Leadership Quote</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Georgia, serif;
       background: #f9f9f9;
-      padding: 40px;
+      padding: 30px;
       text-align: center;
     }
     .quote-box {
@@ -16,44 +16,67 @@
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 700px;
+      max-width: 800px;
       margin: auto;
     }
     .quote {
-      font-size: 1.5em;
+      font-size: 1.6em;
       margin-bottom: 20px;
     }
     .author {
       font-size: 1.2em;
       color: #555;
     }
-    button {
+    .buttons {
       margin-top: 30px;
+    }
+    button {
       font-size: 1em;
-      padding: 10px 20px;
+      padding: 10px 16px;
+      margin: 5px;
       border: none;
-      background: #007BFF;
-      color: white;
       border-radius: 5px;
       cursor: pointer;
+      background-color: #007BFF;
+      color: white;
     }
     button:hover {
-      background: #0056b3;
+      background-color: #0056b3;
     }
     #confirmation {
       margin-top: 15px;
       color: green;
       font-size: 0.95em;
     }
+    #favoritesList {
+      margin-top: 40px;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .fav-quote {
+      background: #fff9e6;
+      border-left: 4px solid #ffcc00;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="quote-box">
-    <div class="quote" id="quoteText">Loading quote...</div>
+    <div class="quote" id="quoteText">Loading...</div>
     <div class="author" id="quoteAuthor"></div>
-    <button onclick="copyQuote()">Share This Quote</button>
+    <div class="buttons">
+      <button onclick="nextQuote()">Next Quote</button>
+      <button onclick="copyQuote()">Share This Quote</button>
+      <button onclick="saveFavorite()">❤️ Favorite</button>
+      <button onclick="viewFavorites()">📋 View Favorites</button>
+    </div>
     <div id="confirmation"></div>
   </div>
+
+  <div id="favoritesList"></div>
 
   <script>
     const quotes = [
@@ -62,23 +85,51 @@
       { text: "Don't wait. The time will never be just right.", author: "Napoleon Hill" },
       { text: "Change your thoughts and you change your world.", author: "Norman Vincent Peale" },
       { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
-      { text: "The only limit to your impact is your imagination and commitment.", author: "Tony Robbins" }
+      { text: "The only limit to your impact is your imagination and commitment.", author: "Tony Robbins" },
+      { text: "The function of leadership is to produce more leaders, not more followers.", author: "Ralph Nader" },
+      { text: "Success is the progressive realization of a worthy goal or ideal.", author: "Earl Nightingale" }
     ];
 
-    const todayIndex = new Date().getDay() % quotes.length;
-    const todayQuote = quotes[todayIndex];
-    document.getElementById("quoteText").innerText = `"${todayQuote.text}"`;
-    document.getElementById("quoteAuthor").innerText = `– ${todayQuote.author}`;
+    let currentIndex = new Date().getDate() % quotes.length;
+
+    function displayQuote() {
+      const q = quotes[currentIndex];
+      document.getElementById("quoteText").innerText = `"${q.text}"`;
+      document.getElementById("quoteAuthor").innerText = `– ${q.author}`;
+      document.getElementById("confirmation").innerText = "";
+    }
+
+    function nextQuote() {
+      currentIndex = (currentIndex + 1) % quotes.length;
+      displayQuote();
+    }
 
     function copyQuote() {
-      const textToCopy = `"${todayQuote.text}" – ${todayQuote.author}`;
-      navigator.clipboard.writeText(textToCopy).then(() => {
+      const quote = quotes[currentIndex];
+      const text = `"${quote.text}" – ${quote.author}`;
+      navigator.clipboard.writeText(text).then(() => {
         document.getElementById("confirmation").innerText = "✅ Quote copied to clipboard!";
-        setTimeout(() => {
-          document.getElementById("confirmation").innerText = "";
-        }, 3000);
+        setTimeout(() => document.getElementById("confirmation").innerText = "", 3000);
       });
     }
+
+    function saveFavorite() {
+      const quote = quotes[currentIndex];
+      let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      favorites.push(quote);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      document.getElementById("confirmation").innerText = "❤️ Saved to favorites!";
+      setTimeout(() => document.getElementById("confirmation").innerText = "", 3000);
+    }
+
+    function viewFavorites() {
+      let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      const list = favorites.map(f => `<div class="fav-quote">"${f.text}"<br><strong>– ${f.author}</strong></div>`).join("");
+      document.getElementById("favoritesList").innerHTML = `<h3>⭐ Your Favorites</h3>${list}`;
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    displayQuote();
   </script>
 </body>
 </html>
